@@ -155,7 +155,7 @@ module DatapathPipelined (
   reg [7:0] div_is_rem_pipe;     // Lưu xem đó là lệnh lấy dư (REM) hay lấy thương
   reg [7:0] div_quot_neg_pipe;   // Lưu dấu kết quả
   reg [7:0] div_rem_neg_pipe;    
-  integer k;                     // Biến chạy vòng lặp
+  integer k;                     
   
   reg [7:0]  div_by_zero_pipe;
   reg [7:0]  div_overflow_pipe; 
