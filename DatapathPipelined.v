@@ -493,12 +493,19 @@ module DatapathPipelined (
   // ALU Inputs
   wire [31:0] alu_in1 = (x_alu_op == ALU_AUIPC || x_alu_op == ALU_JAL || x_alu_op == ALU_JALR) ? x_pc : x_op1_val;
   wire [31:0] alu_in2 = (x_alu_src_b_imm) ? x_imm : x_op2_val;
-
+  // CLA for ADD
+  wire [31:0] cla_sum;
+  cla u_cla (
+    .a(alu_in1),
+    .b(alu_in2),
+    .cin(1'b0),   
+    .sum(cla_sum)
+  );
   // --- ALU ---
   reg [31:0] x_alu_result_normal;
   always @(*) begin
     case (x_alu_op)
-        ALU_ADD:  x_alu_result_normal = alu_in1 + alu_in2;
+        ALU_ADD:  x_alu_result_normal = cla_sum;
         ALU_SUB:  x_alu_result_normal = alu_in1 - alu_in2;
         ALU_AND:  x_alu_result_normal = alu_in1 & alu_in2;
         ALU_OR:   x_alu_result_normal = alu_in1 | alu_in2;
