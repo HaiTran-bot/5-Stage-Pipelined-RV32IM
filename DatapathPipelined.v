@@ -387,7 +387,7 @@ module DatapathPipelined (
       end else begin
           div_wb_valid_r <= div_done; // div_done lấy từ div_valid_pipe[7]
           div_wb_rd_r    <= div_done_rd;
-          div_wb_data_r  <= div_wb_data;
+          div_wb_data_r  <= div_wb_data; //luu kq chia để phòng trường hợp cần dùng lại mà bị mất do qua chu kì kế
       end
   end
 
@@ -578,7 +578,7 @@ module DatapathPipelined (
             div_by_zero_pipe[0] <= 0;
             div_overflow_pipe[0] <= 0;
         end
-    end else begin
+    end else begin //when stall keep going but ko nap lenh
         div_valid_pipe[7:1] <= div_valid_pipe[6:0];
         
         div_rd_pipe[7] <= div_rd_pipe[6]; div_rd_pipe[6] <= div_rd_pipe[5];
