@@ -521,7 +521,7 @@ module DatapathPipelined (
   
 
   // Divider  
-  reg [31:0] div_op1_latched, div_op2_latched; 
+	reg [31:0] div_op1_latched, div_op2_latched; //chot du lieu tranh bi nhieu loan du lieu khi qua chu ky moi
   
   wire current_quot_neg = x_op1_val[31] ^ x_op2_val[31];
   wire current_rem_neg  = x_op1_val[31];
