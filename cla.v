@@ -44,15 +44,26 @@ module gp4(input wire [3:0] gin, pin,
            output wire [2:0] cout);
    
    // TODO: your code here
-   assign pout = &pin;
+    wire [3:0] g_internal, p_internal;
+           
+    gp1 u0(.a(gin[0]), .b(pin[0]), .g(g_internal[0]), .p(p_internal[0]));
+    gp1 u1(.a(gin[1]), .b(pin[1]), .g(g_internal[1]), .p(p_internal[1]));
+    gp1 u2(.a(gin[2]), .b(pin[2]), .g(g_internal[2]), .p(p_internal[2]));
+    gp1 u3(.a(gin[3]), .b(pin[3]), .g(g_internal[3]), .p(p_internal[3]));
+
+    assign pout = &p_internal;
   
-   assign gout = gin[3] | (pin[3] & gin[2]) | ((&pin[3:2]) & gin[1]) | ((&pin[3:1]) & gin[0]);
-   // c1 = g0 | (p0 & cin)
-   assign cout[0] = gin[0] | (pin[0] & cin);
-   // c2 = g1 | (p1 & g0) | (p1&p0 & cin)
-   assign cout[1] = gin[1] | (pin[1] & gin[0]) | ((&pin[1:0]) & cin);
-   // c3 = g2 | (p2 & g1) | (p2&p1 & g0) | (p2&p1&p0 & cin)
-   assign cout[2] = gin[2] | (pin[2] & gin[1]) | ((&pin[2:1]) & gin[0]) | ((&pin[2:0]) & cin);
+    assign gout = g_internal[3] 
+                | (p_internal[3] & g_internal[2]) 
+                | ((&p_internal[3:2]) & g_internal[1]) 
+                | ((&p_internal[3:1]) & g_internal[0]);
+
+    // c1
+    assign cout[0] = g_internal[0] | (p_internal[0] & cin);
+    // c2
+    assign cout[1] = g_internal[1] | (p_internal[1] & g_internal[0]) | ((&p_internal[1:0]) & cin);
+    // c3
+    assign cout[2] = g_internal[2] | (p_internal[2] & g_internal[1]) | ((&p_internal[2:1]) & g_internal[0]) | ((&p_internal[2:0]) & cin);
 endmodule
 /** Same as gp4 but for an 8-bit window instead */
 module gp8(input wire [7:0] gin, pin,
@@ -60,119 +71,74 @@ module gp8(input wire [7:0] gin, pin,
            output wire gout, pout,
            output wire [6:0] cout);
    // TODO: your code here
-     assign pout = &pin; // p7 & ... & p0
-   assign gout = gin[7]
-               | (pin[7] & gin[6])
-               | ((&pin[7:6]) & gin[5])
-               | ((&pin[7:5]) & gin[4])
-               | ((&pin[7:4]) & gin[3])
-               | ((&pin[7:3]) & gin[2])
-               | ((&pin[7:2]) & gin[1])
-               | ((&pin[7:1]) & gin[0]);
-   // c1
-   assign cout[0] = gin[0] | (pin[0] & cin);
-   // c2
-   assign cout[1] = gin[1]
-                  | (pin[1] & gin[0])
-                  | ((&pin[1:0]) & cin);
-   // c3
-   assign cout[2] = gin[2]
-                  | (pin[2] & gin[1])
-                  | ((&pin[2:1]) & gin[0])
-                  | ((&pin[2:0]) & cin);
-   // c4
-   assign cout[3] = gin[3]
-                  | (pin[3] & gin[2])
-                  | ((&pin[3:2]) & gin[1])
-                  | ((&pin[3:1]) & gin[0])
-                  | ((&pin[3:0]) & cin);
-   // c5
-   assign cout[4] = gin[4]
-                  | (pin[4] & gin[3])
-                  | ((&pin[4:3]) & gin[2])
-                  | ((&pin[4:2]) & gin[1])
-                  | ((&pin[4:1]) & gin[0])
-                  | ((&pin[4:0]) & cin);
-   // c6
-   assign cout[5] = gin[5]
-                  | (pin[5] & gin[4])
-                  | ((&pin[5:4]) & gin[3])
-                  | ((&pin[5:3]) & gin[2])
-                  | ((&pin[5:2]) & gin[1])
-                  | ((&pin[5:1]) & gin[0])
-                  | ((&pin[5:0]) & cin);
-   // c7
-   assign cout[6] = gin[6]
-                  | (pin[6] & gin[5])
-                  | ((&pin[6:5]) & gin[4])
-                  | ((&pin[6:4]) & gin[3])
-                  | ((&pin[6:3]) & gin[2])
-                  | ((&pin[6:2]) & gin[1])
-                  | ((&pin[6:1]) & gin[0])
-                  | ((&pin[6:0]) & cin);
+    wire gout_low, pout_low;   
+    wire gout_high, pout_high;
+    wire c_mid;                
+    wire [2:0] cout_low;     
+    wire [2:0] cout_high;
+
+    gp4 gp4_low (
+        .gin(gin[3:0]), 
+        .pin(pin[3:0]),
+        .cin(cin),
+        .gout(gout_low), 
+        .pout(pout_low), 
+        .cout(cout_low)
+    );
+
+    assign c_mid = gout_low | (pout_low & cin);
+
+    gp4 gp4_high (
+        .gin(gin[7:4]), 
+        .pin(pin[7:4]),
+        .cin(c_mid),
+        .gout(gout_high), 
+        .pout(pout_high), 
+        .cout(cout_high)
+    );
+
+    assign pout = pout_high & pout_low;
+    assign gout = gout_high | (pout_high & gout_low);
+
+    // cout [6:0] = {c7, c6, c5, c4, c3, c2, c1}
+    assign cout = {cout_high, c_mid, cout_low};
 endmodule
 module cla
   (input wire [31:0] a, b,
    input wire cin,
    output wire [31:0] sum);
    // TODO: your code here
-   //gp1
-   wire [31:0] g, p;
-   assign g = a & b;
-   assign p = a | b;
-   //block0 = bits [7:0], block1 = [15:8], block2 = [23:16], block3 = [31:24]
-   wire gout0, pout0;
-   wire gout1, pout1;
-   wire gout2, pout2;
-   wire gout3, pout3;
-   wire [6:0] cout8_0;
-   wire [6:0] cout8_1;
-   wire [6:0] cout8_2;
-   wire [6:0] cout8_3;
-   wire c_block0, c_block1, c_block2, c_block3;
-   assign c_block0 = cin;
-   // instantiate gp8
-   gp8 gp8_0(.gin(g[7:0]), .pin(p[7:0]), .cin(c_block0), .gout(gout0), .pout(pout0), .cout(cout8_0));
-   // c_block1 depends on gout0/pout0 and c_block0
-   assign c_block1 = gout0 | (pout0 & c_block0);
-   gp8 gp8_1(.gin(g[15:8]), .pin(p[15:8]), .cin(c_block1), .gout(gout1), .pout(pout1), .cout(cout8_1));
-   assign c_block2 = gout1 | (pout1 & c_block1);
-   gp8 gp8_2(.gin(g[23:16]), .pin(p[23:16]), .cin(c_block2), .gout(gout2), .pout(pout2), .cout(cout8_2));
-   assign c_block3 = gout2 | (pout2 & c_block2);
-   gp8 gp8_3(.gin(g[31:24]), .pin(p[31:24]), .cin(c_block3), .gout(gout3), .pout(pout3), .cout(cout8_3));
-   wire [31:0] carry;
-   assign carry[0] = c_block0;
-   assign carry[1] = cout8_0[0];
-   assign carry[2] = cout8_0[1];
-   assign carry[3] = cout8_0[2];
-   assign carry[4] = cout8_0[3];
-   assign carry[5] = cout8_0[4];
-   assign carry[6] = cout8_0[5];
-   assign carry[7] = cout8_0[6];
-   assign carry[8] = c_block1;
-   assign carry[9] = cout8_1[0];
-   assign carry[10] = cout8_1[1];
-   assign carry[11] = cout8_1[2];
-   assign carry[12] = cout8_1[3];
-   assign carry[13] = cout8_1[4];
-   assign carry[14] = cout8_1[5];
-   assign carry[15] = cout8_1[6];
-   assign carry[16] = c_block2;
-   assign carry[17] = cout8_2[0];
-   assign carry[18] = cout8_2[1];
-   assign carry[19] = cout8_2[2];
-   assign carry[20] = cout8_2[3];
-   assign carry[21] = cout8_2[4];
-   assign carry[22] = cout8_2[5];
-   assign carry[23] = cout8_2[6];
-   assign carry[24] = c_block3;
-   assign carry[25] = cout8_3[0];
-   assign carry[26] = cout8_3[1];
-   assign carry[27] = cout8_3[2];
-   assign carry[28] = cout8_3[3];
-   assign carry[29] = cout8_3[4];
-   assign carry[30] = cout8_3[5];
-   assign carry[31] = cout8_3[6];
-   // final sum bit: sum[i] = a[i] ^ b[i] ^ carry[i]
-   assign sum = a ^ b ^ carry;
+    wire [3:0] G_blk, P_blk; 
+    wire [3:0] C_blk;        
+    wire [6:0] cout8_0, cout8_1, cout8_2, cout8_3;
+
+    assign C_blk[0] = cin;
+
+    // Block 0: Bits 7:0
+    // LƯU Ý: Truyền a vào gin, b vào pin
+    gp8 gp8_0(.gin(a[7:0]), .pin(b[7:0]), .cin(C_blk[0]), 
+              .gout(G_blk[0]), .pout(P_blk[0]), .cout(cout8_0));
+
+    // Block 1: Bits 15:8
+    assign C_blk[1] = G_blk[0] | (P_blk[0] & C_blk[0]);
+    gp8 gp8_1(.gin(a[15:8]), .pin(b[15:8]), .cin(C_blk[1]), 
+              .gout(G_blk[1]), .pout(P_blk[1]), .cout(cout8_1));
+
+    // Block 2: Bits 23:16
+    assign C_blk[2] = G_blk[1] | (P_blk[1] & C_blk[1]);
+    gp8 gp8_2(.gin(a[23:16]), .pin(b[23:16]), .cin(C_blk[2]), 
+              .gout(G_blk[2]), .pout(P_blk[2]), .cout(cout8_2));
+
+    // Block 3: Bits 31:24
+    assign C_blk[3] = G_blk[2] | (P_blk[2] & C_blk[2]);
+    gp8 gp8_3(.gin(a[31:24]), .pin(b[31:24]), .cin(C_blk[3]), 
+              .gout(G_blk[3]), .pout(P_blk[3]), .cout(cout8_3));
+           
+    wire [31:0] carry;
+    assign carry[7:0]   = {cout8_0, C_blk[0]};
+    assign carry[15:8]  = {cout8_1, C_blk[1]};
+    assign carry[23:16] = {cout8_2, C_blk[2]};
+    assign carry[31:24] = {cout8_3, C_blk[3]};
+
+    assign sum = a ^ b ^ carry;
 endmodule
