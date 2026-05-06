@@ -86,9 +86,6 @@ The processor supports the **RV32IM** subset:
 ## How to Run
 
 1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/your-username/5-Stage-Pipelined-RV32IM.git](https://github.com/your-username/5-Stage-Pipelined-RV32IM.git)
-    ```
 2.  **Open in Vivado:**
     * Create a new project.
     * Add all design files (`.v`) and the memory file (`.hex`).
