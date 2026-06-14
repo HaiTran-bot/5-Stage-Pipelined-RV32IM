@@ -5,7 +5,7 @@
 ![Pipeline](https://img.shields.io/badge/Pipeline-5_Stage-orange)
 ![Tool](https://img.shields.io/badge/Tool-Vivado_%7C_GTKWave-green)
 
-## 📌 Overview
+## Overview
 
 This project implements a fully synthesizable **32-bit RISC-V Processor** based on the **RV32IM** Instruction Set Architecture. The core features a classic **5-stage pipeline** designed for high throughput, integrated with custom-designed hardware arithmetic units including a **Hierarchical Carry Lookahead Adder (CLA)** and a **Non-blocking Pipelined Divider**.
 
@@ -13,7 +13,7 @@ The design features a robust **Hazard Detection Unit** that handles Data Hazards
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 * **ISA Support:** RV32IM (Integer + Multiplication/Division).
 * **Pipeline Structure:** 5 Stages (IF, ID, EX, MEM, WB).
@@ -27,7 +27,7 @@ The design features a robust **Hazard Detection Unit** that handles Data Hazards
 
 ---
 
-## 🏗️ Architecture Design
+## Architecture Design
 
 The processor follows the standard 5-stage pipeline organization:
 
@@ -39,7 +39,7 @@ The processor follows the standard 5-stage pipeline organization:
 | **4. MEM (Memory)** | Accesses Data Memory for Load (`LW`, `LB`, etc.) and Store (`SW`, `SB`, etc.) instructions. |
 | **5. WB (Writeback)** | Writes the execution result or memory data back to the Register File. |
 
-### 🧩 Hierarchical Carry Lookahead Adder (CLA)
+###  Hierarchical Carry Lookahead Adder (CLA)
 Instead of using the standard `+` operator, the ALU utilizes a custom CLA module for integer addition. The design is hierarchical:
 1.  **gp1 (Bit-level):** Computes Generate (`g`) and Propagate (`p`) for single bits.
 2.  **gp4 (Group-level):** Instantiates 4 `gp1` modules to compute Lookahead Carry for a 4-bit block.
@@ -53,7 +53,7 @@ The division unit is designed as a separate pipeline parallel to the main ALU.
 
 ---
 
-## ⚡ Hazard Handling Details
+##  Hazard Handling Details
 
 ### 1. Data Hazards (RAW)
 * **Forwarding:** Data is bypassed from the end of the EX stage or the end of the MEM stage back to the EX stage input.
@@ -66,7 +66,7 @@ The division unit is designed as a separate pipeline parallel to the main ALU.
 
 ---
 
-## 📝 Supported Instructions
+## Supported Instructions
 
 The processor supports the **RV32IM** subset:
 
