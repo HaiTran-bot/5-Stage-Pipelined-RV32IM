@@ -1,10 +1,5 @@
 # 5-Stage Pipelined RISC-V Processor (RV32IM)
 
-![Language](https://img.shields.io/badge/Language-Verilog%2FSystemVerilog-blue)
-![Architecture](https://img.shields.io/badge/Architecture-RISC--V_RV32IM-red)
-![Pipeline](https://img.shields.io/badge/Pipeline-5_Stage-orange)
-![Tool](https://img.shields.io/badge/Tool-Vivado_%7C_GTKWave-green)
-
 ## Overview
 
 This project implements a fully synthesizable **32-bit RISC-V Processor** based on the **RV32IM** Instruction Set Architecture. The core features a classic **5-stage pipeline** designed for high throughput, integrated with custom-designed hardware arithmetic units including a **Hierarchical Carry Lookahead Adder (CLA)** and a **Non-blocking Pipelined Divider**.
